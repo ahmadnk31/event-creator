@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch","fullTextIndex"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Event{
+  id String @id @default(uuid())
+  userId String
+  title String 
+  description String?
+  location String?
+  date DateTime?
+  expiresAt DateTime?
+  price Float?
+  qrCode String?
+  isPublished Boolean? @default(false)
+  purchases Purchase[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId])
+}
+model Purchase{
+  id String @id @default(uuid())
+  userId String
+  eventId String
+  event Event @relation(fields: [eventId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([eventId])
+  @@unique([userId, eventId])
+}
+
+
+model StripeCustomer{
+  id String @id @default(uuid())
+  userId String @unique
+  stripeCustomerId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId])
+
+}
